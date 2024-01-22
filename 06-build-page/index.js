@@ -39,6 +39,9 @@ async function fillTemplate(templatePath, componentsPath, targetPath) {
     }
   }
 
+  const templateTagRegExt = /\{\{.*?\}\}/g;
+  template = template.replaceAll(templateTagRegExt, '');
+
   await fsPromises.writeFile(targetPath, template);
 }
 
