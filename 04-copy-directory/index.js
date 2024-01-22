@@ -1,18 +1,24 @@
-const { readdir, copyFile, mkdir, unlink } = require('fs/promises');
+const { readdir, copyFile, mkdir, rm, stat } = require('fs/promises');
 const path = require('path');
 
 const copyFromPath = path.join(__dirname, 'files');
 const copyToPath = path.join(__dirname, 'files-copy');
 
 async function copyDir(from, to) {
-  const files = await readdir(from);
-  await Promise.all(
-    files.map((fileName) => {
-      const fromFile = path.join(from, fileName);
-      const toFile = path.join(to, fileName);
-      return copyFile(fromFile, toFile);
-    }),
-  );
+  const dirContents = await readdir(from);
+
+  for (const dirItem of dirContents) {
+    const itemStat = await stat(path.join(from, dirItem));
+    const source = path.join(from, dirItem);
+    const target = path.join(to, dirItem);
+    if (itemStat.isDirectory()) {
+      await copyDir(source, target);
+    }
+    if (itemStat.isFile()) {
+      await mkdir(path.dirname(target), { recursive: true });
+      await copyFile(source, target);
+    }
+  }
 }
 
 async function resetDir(from, to) {
@@ -24,12 +30,10 @@ async function resetDir(from, to) {
   }
 
   if (files) {
-    await Promise.all(
-      files.map((fileName) => {
-        const removeFile = path.join(to, fileName);
-        return unlink(removeFile);
-      }),
-    );
+    for (const fileName of files) {
+      const removePath = path.join(to, fileName);
+      await rm(removePath, { recursive: true });
+    }
   }
 
   await copyDir(from, to);
