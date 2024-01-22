@@ -14,7 +14,7 @@ async function readFiles() {
       const ext = path.extname(fileName);
       const name = path.basename(fileName, ext);
       const size = fileStat.size;
-      console.log(`${name} - ${ext.slice(1)} - ${size}`);
+      console.log(`${name} - ${ext.slice(1)} - ${size}B`);
     }
   }
 }
