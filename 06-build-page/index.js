@@ -62,10 +62,10 @@ async function copyFiles(sourceDir, targetPath) {
     const source = path.join(sourceDir, dirItem);
     const target = path.join(targetPath, dirItem);
     if (itemStat.isDirectory()) {
+      await fsPromises.mkdir(target, { recursive: true });
       await copyFiles(source, target);
     }
     if (itemStat.isFile()) {
-      await fsPromises.mkdir(path.dirname(target), { recursive: true });
       await fsPromises.copyFile(source, target);
     }
   }

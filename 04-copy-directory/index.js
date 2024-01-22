@@ -12,10 +12,10 @@ async function copyDir(from, to) {
     const source = path.join(from, dirItem);
     const target = path.join(to, dirItem);
     if (itemStat.isDirectory()) {
+      await mkdir(target, { recursive: true });
       await copyDir(source, target);
     }
     if (itemStat.isFile()) {
-      await mkdir(path.dirname(target), { recursive: true });
       await copyFile(source, target);
     }
   }
