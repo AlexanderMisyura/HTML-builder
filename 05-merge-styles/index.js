@@ -1,5 +1,4 @@
 const fsPromises = require('fs/promises');
-const fs = require('fs');
 const path = require('path');
 
 const sourceDir = path.join(__dirname, 'styles');
@@ -10,16 +9,16 @@ function filterFileType(fileNames, ext) {
 }
 
 async function bundleStyles() {
+  await fsPromises.writeFile(bundle, '');
   const files = await fsPromises.readdir(sourceDir);
   const cssFiles = filterFileType(files, '.css');
 
   for (let i = 0; i < cssFiles.length; i++) {
     const fileName = cssFiles[i];
-    const flags = i === 0 ? 'w' : 'a';
     const source = path.join(sourceDir, fileName);
-    const readableStream = fs.createReadStream(source);
-    const writableStream = fs.createWriteStream(bundle, { flags });
-    readableStream.pipe(writableStream);
+
+    const data = await fsPromises.readFile(source, 'utf-8');
+    await fsPromises.appendFile(bundle, data);
   }
 }
 
